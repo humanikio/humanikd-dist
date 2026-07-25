@@ -19,14 +19,42 @@ humanikd setup   # guided first-run — START HERE
 ```
 
 `setup` walks the steps in order and stops at the first real blocker. It never
-installs anything itself (it prints the command) and never touches credentials.
+installs third-party software (it prints the command) and never touches
+credentials. Its last step offers to install the auto-start service for you.
 
 Then:
 
 ```bash
 humanikd verify        # is the backend serveable?
-humanikd serve         # run it
+humanikd serve         # run it (foreground) — or let the service run it, below
 ```
+
+## Sign in to Claude once (agent devices)
+
+If this machine runs the **Claude Code agent**, sign in a single time:
+
+```bash
+claude    # log in when prompted
+```
+
+That's all — you're set until the token expires and Claude asks you to sign in
+again. Skip it and jobs fail with `authentication_failed`.
+
+## Keep it running (auto-start on reboot + wake)
+
+`humanikd setup` offers this at the end; you can also do it directly. `install`
+picks the right kind for your device:
+
+```bash
+# macOS agent device — runs as YOU (reads your keychain), no sudo:
+humanikd service install
+# local-model / Linux / Windows — system service:
+sudo humanikd service install
+
+humanikd service status
+```
+
+It restarts humanikd at login and after the machine wakes.
 
 ## Two roles — pick one per machine
 
@@ -35,6 +63,7 @@ humanikd serve         # run it
 | Serves | completions from Ollama (or compatible) | an agent turn from the Claude Code CLI |
 | Needs | `ollama serve` running | `claude` installed **and signed in** |
 | Config | `backend.ollama` | `backend.claude_agent.enabled: true` |
+| Auto-start | `sudo humanikd service install` | `humanikd service install` (no sudo — LaunchAgent) |
 
 ## Verify a download (recommended)
 
