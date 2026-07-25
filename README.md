@@ -22,12 +22,16 @@ humanikd setup   # guided first-run — START HERE
 installs third-party software (it prints the command) and never touches
 credentials. Its last step offers to install the auto-start service for you.
 
-Then:
+Then check it and let the auto-start service run it **in the background**:
 
 ```bash
-humanikd verify        # is the backend serveable?
-humanikd serve         # run it (foreground) — or let the service run it, below
+humanikd verify           # is the backend serveable?
+humanikd service install  # run it as a background daemon (setup offers this too)
 ```
+
+> `humanikd serve` also exists, but it runs in the **foreground** and blocks the
+> terminal — it's for a quick test/debug, not how you run it day to day. The
+> service (below) is the real daemon: no terminal, starts at login.
 
 ## Sign in to Claude once (agent devices)
 
@@ -40,10 +44,11 @@ claude    # log in when prompted
 That's all — you're set until the token expires and Claude asks you to sign in
 again. Skip it and jobs fail with `authentication_failed`.
 
-## Keep it running (auto-start on reboot + wake)
+## Run it as a background daemon (recommended)
 
-`humanikd setup` offers this at the end; you can also do it directly. `install`
-picks the right kind for your device:
+This is how you actually run humanikd — **no terminal to keep open.** `humanikd
+setup` offers it at the end; you can also do it directly. `install` picks the
+right kind for your device:
 
 ```bash
 # macOS agent device — runs as YOU (reads your keychain), no sudo:
@@ -54,7 +59,8 @@ sudo humanikd service install
 humanikd service status
 ```
 
-It restarts humanikd at login and after the machine wakes.
+It runs in the background, starts at login, and restarts after the machine wakes
+or the process exits.
 
 ## Two roles — pick one per machine
 
@@ -90,12 +96,12 @@ Targets: `humanikd-darwin-arm64`, `humanikd-darwin-amd64`, `humanikd-linux-amd64
 |---|---|
 | `humanikd setup` | Guided first run |
 | `humanikd enroll --code <CODE>` | Pair this machine (get the code in the console) |
-| `humanikd serve` | Run the daemon |
-| `humanikd verify` | Check the backend is serveable |
+| `humanikd service <install\|start\|stop\|status>` | **Run as a background daemon** (recommended; also on boot) |
+| `humanikd serve` | Run in the **foreground** — a quick test; blocks the terminal |
+| `humanikd verify` | Check the backend is serveable (+ service state) |
 | `humanikd status` | Config, backend, enrollment, **version** |
 | `humanikd version` | Print the installed version |
 | `humanikd upgrade` | Check for a newer release |
-| `humanikd service <install\|start\|stop\|status>` | Run on boot (native service) |
 
 ## Staying up to date
 
