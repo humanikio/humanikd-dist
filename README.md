@@ -63,5 +63,24 @@ Targets: `humanikd-darwin-arm64`, `humanikd-darwin-amd64`, `humanikd-linux-amd64
 | `humanikd enroll --code <CODE>` | Pair this machine (get the code in the console) |
 | `humanikd serve` | Run the daemon |
 | `humanikd verify` | Check the backend is serveable |
-| `humanikd status` | Config, backend, enrollment |
+| `humanikd status` | Config, backend, enrollment, **version** |
+| `humanikd version` | Print the installed version |
+| `humanikd upgrade` | Check for a newer release |
 | `humanikd service <install\|start\|stop\|status>` | Run on boot (native service) |
+
+## Staying up to date
+
+The installer always fetches the **latest** release, so re-running it upgrades in
+place:
+
+```bash
+curl -fsSL https://get.humanik.io/agent | sh    # pulls the newest release
+```
+
+`humanikd upgrade` tells you whether a newer version exists (it doesn't modify
+anything — it just checks and prints the command above). To pin a specific version
+instead of latest:
+
+```bash
+HUMANIKD_VERSION=v0.1.0 curl -fsSL https://get.humanik.io/agent | sh
+```
