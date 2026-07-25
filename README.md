@@ -14,8 +14,8 @@ keypair at enrollment and sends only the public half.
 ## Install
 
 ```bash
-curl -fsSL https://get.humanik.io/agent | sh   # installs the right binary for your OS/arch
-humanikd setup                                 # guided first-run — START HERE
+curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
+humanikd setup   # guided first-run — START HERE
 ```
 
 `setup` walks the steps in order and stops at the first real blocker. It never
@@ -74,7 +74,7 @@ The installer always fetches the **latest** release, so re-running it upgrades i
 place:
 
 ```bash
-curl -fsSL https://get.humanik.io/agent | sh    # pulls the newest release
+curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
 ```
 
 `humanikd upgrade` tells you whether a newer version exists (it doesn't modify
@@ -82,5 +82,6 @@ anything — it just checks and prints the command above). To pin a specific ver
 instead of latest:
 
 ```bash
-HUMANIKD_VERSION=v0.1.0 curl -fsSL https://get.humanik.io/agent | sh
+HUMANIKD_VERSION=v0.1.0 \
+  curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
 ```
