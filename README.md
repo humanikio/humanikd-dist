@@ -44,6 +44,31 @@ claude    # log in when prompted
 That's all — you're set until the token expires and Claude asks you to sign in
 again. Skip it and jobs fail with `authentication_failed`.
 
+### Your connectors follow the Claude ACCOUNT, not the machine
+
+Worth knowing before you rely on one. The agent inherits the MCP servers you
+connected on this machine — Gmail, Drive, Linear, whatever you set up — so an
+office running here can use them.
+
+But **`claude.ai` connectors belong to the Claude account you are signed into.**
+Sign into a different account (after hitting a usage limit, say) and every one of
+them disappears from the agent. No configuration changes, nothing warns you, and
+the device keeps reporting healthy with fewer abilities than it had yesterday.
+
+```bash
+humanikd verify    # lists your MCP servers and whether each is authenticated
+```
+
+Run that after any account change. Servers you registered on the device
+yourself — `claude mcp add` + `claude mcp login`, or a stdio server — survive the
+switch; the hosted `claude.ai` ones do not, and Google's (Gmail, Drive, Calendar)
+can only be connected through claude.ai.
+
+**Connecting a server is not the same as allowing it.** `allowed_tools` in
+`~/.humanikd/config.yaml` decides what the agent may actually call; a tool that is
+not listed is refused and its server never runs. `humanikd verify` warns when you
+have servers connected but no `mcp__` tool allowed.
+
 ## Run it as a background daemon (recommended)
 
 This is how you actually run humanikd — **no terminal to keep open.** `humanikd
