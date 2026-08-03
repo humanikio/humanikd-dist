@@ -13,8 +13,30 @@ keypair at enrollment and sends only the public half.
 
 ## Install
 
+**macOS / Linux**
+
 ```bash
 curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
+humanikd setup   # guided first-run — START HERE
+```
+
+**Windows** — the line above will not work here. PowerShell aliases `curl` to
+`Invoke-WebRequest`, which rejects `-fsSL` before anything is downloaded, and
+`install.sh` supports macOS and Linux only. Download the binary and put it on
+your PATH:
+
+```powershell
+$dir = "$env:LOCALAPPDATA\Programs\humanikd"
+New-Item -ItemType Directory -Force -Path $dir | Out-Null
+Invoke-WebRequest -Uri "https://github.com/humanikio/humanikd-dist/releases/latest/download/humanikd-windows-amd64.exe" -OutFile "$dir\humanikd.exe"
+[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path","User") + ";$dir", "User")
+```
+
+**Then open a NEW PowerShell window** before continuing — Windows reads `Path`
+only when a shell starts, so the window you just ran that in still cannot see
+`humanikd`. In the new window:
+
+```powershell
 humanikd setup   # guided first-run — START HERE
 ```
 
@@ -76,16 +98,31 @@ setup` offers it at the end; you can also do it directly. `install` picks the
 right kind for your device:
 
 ```bash
-# macOS agent device — runs as YOU (reads your keychain), no sudo:
+# Agent device (macOS / Windows) — runs as YOU, no sudo or admin:
 humanikd service install
-# local-model / Linux / Windows — system service:
+# Local-model device — system service:
 sudo humanikd service install
 
 humanikd service status
 ```
 
-It runs in the background, starts at login, and restarts after the machine wakes
-or the process exits.
+It runs in the background, starts when you log in, and restarts after the machine
+wakes or the process exits.
+
+**Why agent devices run as you, not as a system service.** Claude Code's
+credentials belong to your account — the macOS login keychain, or your Windows
+user profile — and on Windows your device's enrollment key is encrypted against
+your account as well. A service running as root or LocalSystem cannot read any of
+it, so it would start and immediately exit. On macOS that means a LaunchAgent; on
+Windows, a logon task. Both install with the plain command above.
+
+The consequence is the same on both: **it runs while you are logged in.** Logging
+out stops it. There is no version that runs logged-out without storing your
+password, and it would have nothing to work with if it did.
+
+> **Windows, upgrading from v0.1.9 or earlier:** those builds registered a system
+> service that could never start. Remove it once, from an elevated prompt:
+> `sc.exe delete humanikd` — then `humanikd service install` as normal.
 
 ## Two roles — pick one per machine
 
@@ -127,6 +164,79 @@ Targets: `humanikd-darwin-arm64`, `humanikd-darwin-amd64`, `humanikd-linux-amd64
 | `humanikd status` | Config, backend, enrollment, **version** |
 | `humanikd version` | Print the installed version |
 | `humanikd upgrade` | Check for a newer release |
+
+## What this writes to your disk
+
+Everything lives under `~/.humanikd/`. Nothing is written outside it.
+
+| Path | What |
+|---|---|
+| `identity.json` | This machine's enrollment key — **back it up**, it cannot be reissued |
+| `config.yaml` | Your settings |
+| `ws/<tenant>/<workspace>/` | Working directory for agent runs, one per workspace |
+
+### Files a job brings with it
+
+> **Planned, not in the current release.** Listed here so it is not a surprise
+> when it lands.
+
+Some turns arrive with a file rather than only text — a screenshot the agent is
+looking at, a PDF, a spreadsheet. Because Claude Code takes text on its command
+line and nothing else, the daemon writes those files into the run's own workspace
+folder and tells the agent where they are:
+
+```
+~/.humanikd/ws/<tenant>/<workspace>/.attachments/<job>/frame.png
+```
+
+**You never have to clean this up.** The daemon does it:
+
+- anything untouched for **2 hours** is removed, checked every 15 minutes
+- during a long conversation, only the **last 3 turns** of files are kept
+- **on every start, the folder is emptied** — nothing can be in use then, so this
+  also clears anything left behind if the daemon was killed rather than stopped
+- if the folder ever passes **500 MB**, the oldest go first
+
+A turn is refused if one file is over **10 MB**, or its files together exceed
+**25 MB** — you get a clear error rather than a silent truncation.
+
+Two things that follow from this being turn-scoped: an agent may mention a file
+it can no longer open (it should ask for a fresh copy — that is expected, not a
+fault), and an agent whose `allowed_tools` omits `Read` cannot open these at all.
+`humanikd verify` warns about the second.
+
+All of it is adjustable in `config.yaml` — see CONFIG.md.
+
+## What's new in v0.1.10
+
+**Windows works.** Every job on a Windows device previously failed the moment it
+started, with `The filename or extension is too long`. That message names the
+path, but the cause was the size of the request — it went on the command line,
+and Windows caps that at 32,767 characters. It now goes over stdin, which has no
+such limit.
+
+Four more Windows fixes came with it:
+
+- **Claude Code is found when it's installed via npm.** The lookup wanted a
+  literal `claude.exe`; npm ships `claude.cmd`. It now honours PATHEXT and also
+  checks npm's global folder.
+- **Auto-start actually stays up.** Older builds registered a system service that
+  could not read your account's credentials, so it started and stopped within
+  seconds, every time. `humanikd service install` now creates a **logon task**
+  that runs as you — no admin, no password.
+- **Readable output.** `←[1m` and `Γ£ô` no longer appear in PowerShell.
+- **A real install command.** The `curl … | sh` line cannot run in PowerShell;
+  the console now offers per-platform commands, and this README documents the
+  Windows one.
+
+> **Upgrading a Windows machine from v0.1.9 or earlier?** Remove the old, broken
+> service once — from an elevated PowerShell: `sc.exe delete humanikd` — then run
+> `humanikd service install` normally.
+
+**Files a job brings with it.** Turns can now carry a screenshot or a document.
+The daemon writes them into the run's own folder, tells the agent where they are,
+and cleans them up on its own — see [What this writes to your
+disk](#what-this-writes-to-your-disk).
 
 ## Staying up to date
 
