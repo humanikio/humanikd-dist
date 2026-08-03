@@ -20,25 +20,18 @@ curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/i
 humanikd setup   # guided first-run — START HERE
 ```
 
-**Windows** — the line above will not work here. PowerShell aliases `curl` to
-`Invoke-WebRequest`, which rejects `-fsSL` before anything is downloaded, and
-`install.sh` supports macOS and Linux only. Download the binary and put it on
-your PATH:
+**Windows** — use PowerShell. (The line above cannot work here: PowerShell
+aliases `curl` to `Invoke-WebRequest`, which rejects `-fsSL`.)
 
 ```powershell
-$dir = "$env:LOCALAPPDATA\Programs\humanikd"
-New-Item -ItemType Directory -Force -Path $dir | Out-Null
-Invoke-WebRequest -Uri "https://github.com/humanikio/humanikd-dist/releases/latest/download/humanikd-windows-amd64.exe" -OutFile "$dir\humanikd.exe"
-[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path","User") + ";$dir", "User")
-```
-
-**Then open a NEW PowerShell window** before continuing — Windows reads `Path`
-only when a shell starts, so the window you just ran that in still cannot see
-`humanikd`. In the new window:
-
-```powershell
+irm https://github.com/humanikio/humanikd-dist/releases/latest/download/install.ps1 | iex
 humanikd setup   # guided first-run — START HERE
 ```
+
+Installs to `%LOCALAPPDATA%\Programs\humanikd` and adds it to your PATH — **no
+admin needed**. The installer updates the window you ran it in, so `humanikd
+setup` works immediately; other open windows won't see it until you reopen them,
+because Windows reads PATH when a shell starts.
 
 `setup` walks the steps in order and stops at the first real blocker. It never
 installs third-party software (it prints the command) and never touches
@@ -225,13 +218,15 @@ Four more Windows fixes came with it:
   seconds, every time. `humanikd service install` now creates a **logon task**
   that runs as you — no admin, no password.
 - **Readable output.** `←[1m` and `Γ£ô` no longer appear in PowerShell.
-- **A real install command.** The `curl … | sh` line cannot run in PowerShell;
-  the console now offers per-platform commands, and this README documents the
-  Windows one.
+- **A real install command.** `curl … | sh` cannot run in PowerShell, so Windows
+  now has its own installer — `irm …/install.ps1 | iex` — and the console offers
+  per-platform commands.
 
-> **Upgrading a Windows machine from v0.1.9 or earlier?** Remove the old, broken
-> service once — from an elevated PowerShell: `sc.exe delete humanikd` — then run
-> `humanikd service install` normally.
+> **Upgrading a Windows machine from v0.1.9 or earlier?** `humanikd service
+> install` now removes the old, broken service for you. If it says it needs an
+> elevated prompt, run `sc.exe delete humanikd` once as administrator — the new
+> logon task works either way; a leftover service just shows up dead in
+> `Get-Service`.
 
 **Files a job brings with it.** Turns can now carry a screenshot or a document.
 The daemon writes them into the run's own folder, tells the agent where they are,
