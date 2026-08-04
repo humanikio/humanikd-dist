@@ -166,12 +166,15 @@ Everything lives under `~/.humanikd/`. Nothing is written outside it.
 |---|---|
 | `identity.json` | This machine's enrollment key — **back it up**, it cannot be reissued |
 | `config.yaml` | Your settings |
+| `serve.log` | What the daemon is doing — **v0.1.13+**, written however it was started |
 | `ws/<tenant>/<workspace>/` | Working directory for agent runs, one per workspace |
 
-### Files a job brings with it
+`serve.log` is the first place to look when a background daemon is misbehaving.
+Before v0.1.13 one started by the Windows logon task wrote nowhere at all — a
+task action has no shell to redirect from — so "it is running but nothing
+happens" had no evidence to inspect.
 
-> **Planned, not in the current release.** Listed here so it is not a surprise
-> when it lands.
+### Files a job brings with it
 
 Some turns arrive with a file rather than only text — a screenshot the agent is
 looking at, a PDF, a spreadsheet. Because Claude Code takes text on its command
@@ -200,38 +203,73 @@ fault), and an agent whose `allowed_tools` omits `Read` cannot open these at all
 
 All of it is adjustable in `config.yaml` — see CONFIG.md.
 
-## What's new in v0.1.10
+## What's new in v0.1.13
 
-**Windows works.** Every job on a Windows device previously failed the moment it
-started, with `The filename or extension is too long`. That message names the
-path, but the cause was the size of the request — it went on the command line,
-and Windows caps that at 32,767 characters. It now goes over stdin, which has no
-such limit.
+### ⚠️ Windows laptops — one command needed after upgrading
 
-Four more Windows fixes came with it:
+If you installed auto-start on **v0.1.10, v0.1.11 or v0.1.12**, run this once
+after upgrading:
 
-- **Claude Code is found when it's installed via npm.** The lookup wanted a
-  literal `claude.exe`; npm ships `claude.cmd`. It now honours PATHEXT and also
-  checks npm's global folder.
-- **Auto-start actually stays up.** Older builds registered a system service that
-  could not read your account's credentials, so it started and stopped within
-  seconds, every time. `humanikd service install` now creates a **logon task**
-  that runs as you — no admin, no password.
-- **Readable output.** `←[1m` and `Γ£ô` no longer appear in PowerShell.
-- **A real install command.** `curl … | sh` cannot run in PowerShell, so Windows
-  now has its own installer — `irm …/install.ps1 | iex` — and the console offers
-  per-platform commands.
+```powershell
+humanikd service install
+```
 
-> **Upgrading a Windows machine from v0.1.9 or earlier?** `humanikd service
-> install` now removes the old, broken service for you. If it says it needs an
-> elevated prompt, run `sc.exe delete humanikd` once as administrator — the new
-> logon task works either way; a leftover service just shows up dead in
-> `Get-Service`.
+Those builds registered the logon task with Windows' own default settings, which
+are written for an app you launch occasionally rather than a daemon. On a laptop
+that meant it **would not start if you logged in on battery, was killed the moment
+you unplugged the charger, and was killed again after 72 hours** — with nothing to
+restart it. It reported healthy the whole time.
 
-**Files a job brings with it.** Turns can now carry a screenshot or a document.
-The daemon writes them into the run's own folder, tells the agent where they are,
-and cleans them up on its own — see [What this writes to your
-disk](#what-this-writes-to-your-disk).
+v0.1.13 turns all of that off explicitly. But **upgrading alone does not fix an
+already-registered task** — the settings live in the task, not the binary. The
+command above replaces it in place. Desktops on mains power were mostly unaffected.
+
+### Everything else
+
+**The agent can open the files it is given.** Turns that carry a screenshot or a
+document now work end to end. The files were being written correctly all along;
+the agent was handed a path it could not open and reported that nothing had
+arrived. See [What this writes to your disk](#what-this-writes-to-your-disk).
+
+**There is a log now.** `~/.humanikd/serve.log`, written however the daemon was
+started. A background daemon on Windows previously wrote nowhere at all.
+
+**A typo in `config.yaml` fails loudly.** Unknown or misplaced keys used to be
+discarded in silence, so the machine ran on defaults while the file on disk said
+otherwise. The reported case was `allowed_tools` written at the top level instead
+of under `backend.claude_agent`: it parsed, nothing complained, and every tool
+call was refused — indistinguishable from "MCP is broken". The daemon now names
+the offending key and line at startup, and `humanikd verify` fails rather than
+reporting on a config that is not in effect.
+
+**`humanikd upgrade` no longer tells a local build it is current.** If you built
+from source, its version number outranked every release, so `upgrade` reported
+nothing to do while the machine sat several releases behind.
+
+> **`service install` says `Access is denied`?** That is a Task Scheduler policy
+> on the folder, not something humanikd needs. v0.1.13 tries a subfolder first,
+> which avoids it on most machines; if it still appears, run the command **once**
+> from an Administrator PowerShell. The task it creates is still unprivileged.
+
+> **Upgrading from v0.1.9 or earlier on Windows?** `humanikd service install` also
+> removes the old system service those builds registered — the one that could never
+> start. If it says it needs elevation, run `sc.exe delete humanikd` once as
+> administrator.
+
+## If something is wrong
+
+Start with `~/.humanikd/serve.log` and `humanikd verify`. The rest of these are
+the ones whose message points somewhere other than the cause.
+
+| What you see | What it means |
+|---|---|
+| **Windows:** `The filename or extension is too long` | Not the path — Windows' 32,767-character limit on a whole command line. Fixed in v0.1.10; upgrade. |
+| **Windows:** `The command line is too long` | A **different, lower** limit: `cmd.exe` caps at 8,191, and a `claude.cmd` shim runs under it. v0.1.13 prefers a real `claude.exe` when both exist. Installing Claude Code natively (`irm https://claude.ai/install.ps1 \| iex`) avoids it entirely. |
+| The daemon runs but nothing happens, on a laptop | The logon task inherited Windows' battery and 72-hour limits. Re-run `humanikd service install` — see the v0.1.13 notes above. |
+| `Claude Code is not installed` but `claude --version` works | Older builds looked only for `claude.exe`. Fixed in v0.1.13; or set `backend.claude_agent.binary` to the full path. |
+| Tools are visible to the agent but every call is refused | The tool is not in `allowed_tools`. It belongs under `backend.claude_agent`, **not** at the top level of `config.yaml` — v0.1.13 refuses to start on the misplaced version rather than ignoring it. `humanikd verify` prints the exact names. |
+| The agent mentions a file it cannot open | Expected. Files a turn brings are kept for that turn only; it should ask for a fresh copy. |
+| `humanikd upgrade` says you are current, but you are not | You are on a build made from source. v0.1.13 says so instead. |
 
 ## Staying up to date
 
