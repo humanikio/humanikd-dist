@@ -203,6 +203,65 @@ fault), and an agent whose `allowed_tools` omits `Read` cannot open these at all
 
 All of it is adjustable in `config.yaml` — see CONFIG.md.
 
+## What's new in v0.1.14
+
+### A device can now drive your browser — if you turn it on
+
+A Claude Code device can open pages, click, type, read the console and fill forms
+in **your** real browser, using the sessions you are already signed into. No OAuth
+to set up, no connector to configure.
+
+**It is off by default and stays off until you say otherwise.** `humanikd setup`
+asks once, defaults to no, and writes the config for you if you say yes.
+
+This is a different kind of permission from everything else on a device, and worth
+one paragraph before you enable it. Every other tool acts on the machine, inside a
+working directory the daemon derives — that directory is the blast radius, which is
+why a read-only tool ceiling is a real protection. The browser is not bounded by
+it. It acts as you, everywhere you happen to be logged in: mail, banking, cloud
+consoles, your own admin panels. Nothing in `config.yaml` makes that smaller.
+
+Turning it on takes **two** lines, and both are required:
+
+```yaml
+backend:
+  claude_agent:
+    allowed_tools: [Read, Grep, Glob, mcp__claude-in-chrome]
+    chrome:
+      enabled: true
+```
+
+`chrome.enabled` loads the browser tools; `allowed_tools` permits them. One
+without the other is the quiet failure — the tools appear and every call is
+refused. `humanikd verify` says which half is missing. Note the **hyphens**: unlike
+connector names, this one is not normalised, and the underscore spelling matches
+nothing while reading as configured.
+
+**Four things you have to do by hand**, in this order: install the Claude
+extension and sign in, run `claude --chrome` once, **quit and reopen your browser**
+(it reads the handshake only at startup, and skipping this is the most common
+failure by a wide margin), then grant the sites you want reachable in the
+extension's own settings. `humanikd verify` re-checks the first three and lists
+whatever is outstanding. It cannot see the fourth.
+
+**If `ANTHROPIC_API_KEY` is set where the daemon can see it, the browser silently
+does nothing.** Claude Code disables the integration for API-key credentials, with
+no error. `verify` now looks in three places — the service definition, the launchd
+session, and your shell — and names the one it found, because the remedy differs
+and "the daemon's environment" is usually not the terminal you are standing in.
+
+Concurrent jobs on one device **share one browser and are not isolated from each
+other**: listing tabs returns every tab. There is no per-job profile. If jobs must
+not see each other's browsing, dedicate a machine.
+
+Devices set to `mcp.scope: isolated` refuse to enable the browser at all. Isolated
+hides the connectors you configured, but it cannot hide the browser — that server
+is built into Claude Code rather than configured in a file — so allowing both would
+hide your Gmail while handing over your live session.
+
+Full details: [Claude in Chrome](https://code.claude.com/docs/en/chrome) for the
+extension itself, and CONFIG.md for the device side.
+
 ## What's new in v0.1.13
 
 ### ⚠️ Windows laptops — one command needed after upgrading
