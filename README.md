@@ -203,6 +203,28 @@ fault), and an agent whose `allowed_tools` omits `Read` cannot open these at all
 
 All of it is adjustable in `config.yaml` — see CONFIG.md.
 
+## What's new in v0.1.15
+
+Corrections to what v0.1.14 said about the browser, from running it. No behaviour
+changed; what the daemon tells you did.
+
+**The browser surface reaches past this machine.** v0.1.14's notes described "your
+real browser" as though it meant the one on the device. Pairing is per Claude Code
+account, so a browser on another computer is reachable from a job here. Measured on
+a macOS device that listed a connected Windows browser.
+
+`humanikd verify` now says **"on this machine"** where it means it. A missing local
+browser reads as *not observed here* rather than *nothing is reachable*, because
+`pgrep` cannot see another host and nothing outside the agent's own session can
+enumerate paired browsers.
+
+**More than one paired browser needs a human.** When two or more are paired, Claude
+Code asks which to use before acting. A headless device has nobody to answer, which
+makes this a second step that cannot be automated, alongside per-site permissions.
+Pair one browser per account on any device meant to run unattended. What a headless
+job does on hitting this is not yet measured, so `verify` states it as a caution
+rather than a documented failure.
+
 ## What's new in v0.1.14
 
 ### A device can now drive your browser — if you turn it on
@@ -220,6 +242,12 @@ working directory the daemon derives — that directory is the blast radius, whi
 why a read-only tool ceiling is a real protection. The browser is not bounded by
 it. It acts as you, everywhere you happen to be logged in: mail, banking, cloud
 consoles, your own admin panels. Nothing in `config.yaml` makes that smaller.
+
+**It is not bounded by the machine either.** Browsers pair to your Claude Code
+**account**, not to a host, so a browser signed in on a different computer — a
+different operating system, even — is reachable from a job running on this device.
+Enabling this scopes the capability to every browser paired to that account, not to
+the box humanikd is installed on.
 
 Turning it on takes **two** lines, and both are required:
 
