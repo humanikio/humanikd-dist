@@ -203,6 +203,32 @@ fault), and an agent whose `allowed_tools` omits `Read` cannot open these at all
 
 All of it is adjustable in `config.yaml` — see CONFIG.md.
 
+## What's new in v0.1.16
+
+**Cancelled jobs now stop.** When HumanikOS cancels a job, for example because the
+office that asked for it gave up, the daemon now stops the work. Before, the cancel
+was ignored and an agent turn kept running, editing files and calling tools, until
+its own deadline of up to 30 minutes.
+
+- A Claude Code run is stopped with SIGTERM, so it can end its shell commands
+  cleanly. If it is still running 10 seconds later, it is killed. On Windows it is
+  killed straight away, because Windows has no SIGTERM.
+- An OpenClaw turn is stopped with `chat.abort`. Before, a turn the daemon stopped
+  waiting for kept its place in the harness's queue, and later prompts on that
+  conversation waited behind it until the harness restarted.
+- A stopped job reports `cancelled`, and a job that ran out of time reports
+  `timeout`. The two used to be reported the same way.
+
+**Settings files in the agent's workspace are no longer loaded.** Claude Code now
+runs with `--setting-sources user`. It reads your own settings in `~/.claude`, but
+not `.claude/settings.json` or `.claude/settings.local.json` inside the workspace
+directory. That directory belongs to the agent. On a device whose tool ceiling
+allows `Write`, an agent could otherwise add a hook there, and the hook would run
+shell commands on a later turn, outside the ceiling.
+
+If you relied on project settings inside `~/.humanikd/ws`, move them into your user
+settings.
+
 ## What's new in v0.1.15
 
 Corrections to what v0.1.14 said about the browser, from running it. No behaviour
