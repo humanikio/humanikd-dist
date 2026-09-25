@@ -203,6 +203,49 @@ fault), and an agent whose `allowed_tools` omits `Read` cannot open these at all
 
 All of it is adjustable in `config.yaml` — see CONFIG.md.
 
+## What's new in v0.1.18
+
+**`humanikd version` now tells you whether you are current.**
+
+```
+$ humanikd version
+humanikd 0.1.17
+update available: 0.1.17 → 0.1.18
+upgrade in place with:
+  curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
+```
+
+Before, it printed the number and nothing else, so the question people actually
+have needed a second command they had no reason to know about. A machine showing
+an old version next to a console showing a new one looks correct, and an install
+that quietly did not replace the binary was invisible.
+
+The check is quick and optional. If this machine is offline or the check is slow,
+the version still prints at once and nothing else is shown. `humanikd upgrade` is
+still the command that reports a failed check, because there the check is the
+whole job.
+
+## What's new in v0.1.17
+
+**An agent turn now gets two hours, not thirty minutes.** The default
+`request_timeout` for both agent backends is now `2h`.
+
+This machine is the outer bound for any job it runs: whatever HumanikOS allows, a
+lower ceiling here is the one that ends the turn. At thirty minutes, long jobs
+were being cut while they were still working. A measured browser run, sending
+intros and writing 70 rows to a table, was stopped at exactly thirty minutes with
+a third of its work unwritten.
+
+Nothing else changes. A turn that is genuinely stuck is still caught much earlier,
+because HumanikOS stops a job that goes quiet.
+
+**If your `config.yaml` sets `request_timeout` yourself, it is unchanged.** Edit it
+to `2h` and restart the daemon if you want the new ceiling:
+
+```
+humanikd service restart
+```
+
 ## What's new in v0.1.16
 
 **Cancelled jobs now stop.** When HumanikOS cancels a job, for example because the
