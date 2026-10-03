@@ -28,8 +28,8 @@ The rows below are the problems whose message points somewhere other than the ca
 | A connector that worked yesterday is gone | The machine is signed into a different Claude account. `claude.ai` connectors belong to the account |
 | The agent mentions a file it cannot open | Expected. Files a turn brings are kept for that turn; it should ask for a fresh copy |
 | An office tool fails after about 30 seconds | The current limit for one office tool call. The agent sees the error and continues |
-| An office tool says `unknown tool` | That tool belongs to the office's agent framework and only runs inside the office, or the integration endpoint is not declared and enabled |
-| An office tool returned no picture | Pictures from office tools do not reach the machine yet |
+| An office tool says `unknown tool` | The integration endpoint is not declared and enabled, or the office has not restarted since it was added |
+| An office tool returned no picture | The picture was over the size limit (the tool's text says so), or humanikd is older than v0.1.12 |
 | `refusing to run: …/.mcp.json exists` | The agent wrote an MCP config into its working folder. Remove it, or move those servers into your own Claude Code config |
 
 ## Windows

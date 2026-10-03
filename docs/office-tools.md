@@ -39,9 +39,9 @@ turn can read a local file and call an office tool.
 | Tools HumanikOS ships with every office | contacts and conversations, calendars, files, browsers, schedules |
 | Your integration endpoints | Each endpoint an integration declares and enables becomes its own named tool |
 
-While named endpoint tools roll out to every office, some offices reach their integrations
-through one general tool, `hos_integration_request`, which calls the same endpoints by
-integration name and path.
+Every office also has one general tool, `hos_integration_request`, which calls a connected
+integration by its name and a path. It covers endpoints nobody declared, so the named tools
+are better when they exist.
 
 **Not bridged:** tools that belong to the office's own agent framework, such as its shell.
 They only work inside the office.
@@ -62,8 +62,9 @@ office tools, humanikd bridges them, and there is nothing to configure.
   does not change.
 - **One office tool call is limited to about 30 seconds.** A longer call fails with an
   error the agent can read, and the turn continues.
-- **Pictures do not reach your machine yet.** When an office tool returns an image, the
-  agent receives the tool's text only.
+- **Pictures arrive when the tool returns one.** A picture attached to a chat message, for
+  example, reaches the agent as an image along with the tool's text. Very large pictures are
+  left out and the text says so. Needs humanikd v0.1.12 or later.
 - **A dropped connection ends the turn**, including any tool call in progress.
 
 ## Related
