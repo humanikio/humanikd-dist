@@ -158,6 +158,25 @@ Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
 
+## What's new in v0.1.19
+
+**The daemon itself is unchanged. This release marks changes on the HumanikOS side that an
+agent on your machine will notice, and adds documentation.** Upgrading is optional.
+
+**Office tools come from the office's own tool list.** An agent running here is offered
+exactly the tools the office can run: the tools HumanikOS ships with every office, plus each
+endpoint your integrations declare, as its own named tool. Tools that belong to the office's
+own agent framework, such as its shell, are no longer offered, so they no longer fail with
+`unknown tool`.
+
+**Pictures from office tools now reach the agent.** A picture attached to a chat message, for
+example, arrives as an image the agent can see, alongside the tool's text. This needs
+v0.1.12 or later, which already knew how to show them; the pictures were being lost before
+they reached this machine.
+
+**New documentation** in the [docs](docs/) folder: how humanikd works, how office tools reach
+your machine, security, files and logs, and troubleshooting.
+
 ## What's new in v0.1.18
 
 **`humanikd version` now tells you whether you are current.**
