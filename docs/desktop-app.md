@@ -94,6 +94,17 @@ opens it. Your sign-in, workspace choice and settings are kept.
 
 The app's **Machine > Updates** tab updates humanikd, not the app.
 
+## If the app shows an error
+
+If a screen fails, the app says "Something went wrong in Humanik OS" and shows the
+error. **Try again** redraws the screen; **Reload the app** starts the window
+over. If it keeps happening, **Copy details** copies the error, where it
+happened and your system version, ready to send to us. It has no passwords or keys.
+It can include the IDs of the workspace and chat that were open.
+
+humanikd keeps running either way. `humanikd status` shows whether it is
+serving.
+
 ## Uninstall
 
 Turn off **Open at login** first (Profile > Notifications), then quit the app.

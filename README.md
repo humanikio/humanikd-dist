@@ -174,6 +174,18 @@ Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
 
+## What's new in v0.1.22
+
+**Windows: no more terminal windows opening on their own.** The Humanik OS app
+checks humanikd's status every 10 seconds, and on Windows each check opened a
+terminal window for a moment. Those checks, and the ones on the Agent tab, now
+run hidden.
+
+**A crash now shows the error.** If a screen in the app fails, it shows what
+went wrong, with **Copy details**, **Try again** and **Reload the app**, instead
+of "Application error: a client-side exception has occurred". If you see it,
+copy the details and send them to us.
+
 ## What's new in v0.1.21
 
 **The Humanik OS desktop app.** The install command now also installs the app on

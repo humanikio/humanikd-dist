@@ -44,6 +44,15 @@ The rows below are the problems whose message points somewhere other than the ca
 | `service install` says `Access is denied` | A Task Scheduler folder policy. Run the command once from an Administrator PowerShell; the task it creates is still unprivileged |
 | Healthy but never runs, on a laptop | A task installed by v0.1.10 to v0.1.12 kept Windows' battery and 72-hour limits. Upgrade and run `humanikd service install` again |
 
+## The Humanik OS app
+
+| What you see | What it means |
+| --- | --- |
+| "Something went wrong in Humanik OS" with an error and **Copy details** | A screen in the app failed. Try **Try again**, then **Reload the app**. If it comes back, use **Copy details** and send us the text. humanikd is not affected and keeps serving |
+| "Application error: a client-side exception has occurred" | The same kind of failure in app v0.1.21, which did not show the error. Run the install command again to get the current version, which does |
+| On Windows, a terminal window opens for a moment every few seconds | App v0.1.21 opened one each time it checked humanikd's status. Fixed in v0.1.22: run the install command again |
+| No notifications | See [Notifications](notifications.md#if-notifications-do-not-appear) |
+
 ## Local models
 
 | What you see | What it means |
@@ -54,5 +63,6 @@ The rows below are the problems whose message points somewhere other than the ca
 
 ## Related
 
+- [The Humanik OS app](desktop-app.md)
 - [Files and logs](files-and-logs.md)
 - [How humanikd works](how-it-works.md)
