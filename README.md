@@ -38,6 +38,12 @@ admin needed**. The installer updates the window you ran it in, so `humanikd
 setup` works immediately; other open windows won't see it until you reopen them,
 because Windows reads PATH when a shell starts.
 
+On macOS and Windows the same command also installs the **Humanik OS app**, the
+desktop window for your chats, this machine and notifications, and opens it. It
+goes in `/Applications` on macOS and `%LOCALAPPDATA%\Programs\Humanik OS` on
+Windows. Add `HUMANIKD_NO_APP=1` to skip it. See
+[The Humanik OS app](docs/desktop-app.md).
+
 `setup` walks the steps in order and stops at the first real blocker. It never
 installs third-party software (it prints the command) and never touches
 credentials. Its last step offers to install the auto-start service for you.
@@ -114,12 +120,20 @@ password, and it would have nothing to work with if it did.
 
 ## Verify a download (recommended)
 
-Every binary is checksummed and **cosign-signed** (keyless, Sigstore):
+Every file (humanikd and the Humanik OS app) has a `.sha256` and a cosign bundle,
+`.sigstore.json` (keyless, Sigstore). The installers check the `.sha256` for you and
+refuse a file that does not match. To check by hand:
 
 ```bash
 sha256sum -c humanikd-<os>-<arch>.sha256
-cosign verify-blob --signature humanikd-<os>-<arch>.sig humanikd-<os>-<arch>
+cosign verify-blob humanikd-<os>-<arch> \
+  --bundle humanikd-<os>-<arch>.sigstore.json \
+  --certificate-identity-regexp '^https://github.com/humanikio/humanikd/\.github/workflows/release\.yml@' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
+
+The cosign check proves the file was built by our release workflow and not changed
+since.
 
 ## Manual download
 
@@ -152,11 +166,57 @@ Targets: `humanikd-darwin-arm64`, `humanikd-darwin-amd64`, `humanikd-linux-amd64
 | [Office tools on your machine](docs/office-tools.md) | How an agent here uses the office's tools without holding their credentials |
 | [Security](docs/security.md) | The tool limit, your key, connectors, the browser |
 | [Files and logs](docs/files-and-logs.md) | Everything under `~/.humanikd`, and files a turn brings with it |
+| [The Humanik OS app](docs/desktop-app.md) | Installing the desktop app, open at login, updating and uninstalling |
+| [Notifications](docs/notifications.md) | What notifies, how they group, turning them on |
 | [Troubleshooting](docs/troubleshooting.md) | Messages that point somewhere other than the cause |
 
 Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
+
+## What's new in v0.1.21
+
+**The Humanik OS desktop app.** The install command now also installs the app on
+macOS and Windows: chats with your AI employees (on this machine and in the
+cloud), this machine's status, settings, log and updates, and system
+notifications. It opens at login, hidden in the menu bar or tray, so
+notifications keep coming after a restart. Skip it with `HUMANIKD_NO_APP=1`. See
+[The Humanik OS app](docs/desktop-app.md) and [Notifications](docs/notifications.md).
+
+**Sign-in and update warnings come through the app.** While the app is running and
+allowed to notify, humanikd hands its warnings to it, so they show as Humanik OS
+and a click opens the right page. Without the app, humanikd shows them itself as
+before.
+
+**Every download is checked.** The macOS and Linux installer now checks each file
+against its published checksum and refuses one that does not match, as the
+Windows installer already did. A missing checksum on the latest release also
+stops the install.
+
+**Signatures you can verify.** Each file now has a cosign bundle
+(`.sigstore.json`) instead of a bare `.sig`. The old `.sig` files had no
+certificate, so they could not be checked. See
+[Verify a download](#verify-a-download-recommended).
+
+## What's new in v0.1.20
+
+**The daemon warns you when a newer release is available.** Each time it starts it
+checks the public release in the background, retrying for about 13 minutes because
+boot-time Wi-Fi is often not up yet. If a newer release exists it logs the install
+command, and when running as the logged-in user it also raises a desktop
+notification — at once for a release it has not warned about, then at most once
+every 12 hours for the same release. Builds made from source log it only; nothing
+is installed automatically.
+
+**Re-auth prompts now survive a daemon restart.** The "sign in required"
+notification was rate-limited in memory, so a crash-and-restart loop could notify
+on every restart. Both update and re-auth limits now live in
+`~/.humanikd/notify-state.json`, so a restart does not reset them. A failed
+notification also does not use up the window; the next start tries again.
+
+**Windows gets real desktop notifications.** The re-auth and update warnings now
+show a Windows toast instead of doing nothing. macOS and Linux continue to use
+their native notifiers.
 
 ## What's new in v0.1.19
 
