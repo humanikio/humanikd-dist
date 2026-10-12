@@ -18,6 +18,8 @@ The rows below are the problems whose message points somewhere other than the ca
 | A config edit changed nothing | Config is read once at startup. Run `humanikd service stop`, then `humanikd service start` |
 | The daemon stops at startup naming a key | A misspelled or misplaced setting in `config.yaml`. Most often `allowed_tools` written at the top level instead of under `backend.claude_agent` |
 | `humanikd upgrade` says you are current, but you are not | You are on a build made from source |
+| A notification says humanikd is out of date | A newer release exists. Run the command in the notification, or `humanikd upgrade` to see it. The daemon checks each time it starts and shows this at most once every 12 hours for the same release |
+| No update notification, but `serve.log` says out of date | The daemon runs as a system service, which has no desktop to show it on, or this is a build made from source, which only logs it |
 
 ## Claude Code agents
 
