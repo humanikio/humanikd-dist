@@ -81,6 +81,24 @@ Turn it off in **Profile > Notifications > Open at login**. It is also listed in
 If you move the app to another folder, the login entry follows it the next time
 the app starts.
 
+## Keeping this computer awake
+
+Humanik can only send work to a computer that is awake. The **Sleep** tab under
+**This machine** decides when humanikd keeps it awake:
+
+- **Let it sleep:** the computer follows its own sleep settings. A job can be cut
+  off if it sleeps halfway.
+- **Stay awake while working** (the default): awake while a job runs, sleeps as
+  usual between jobs.
+- **Always ready for jobs:** awake all the time, optionally only while plugged in.
+
+**Keep the screen on** is only needed for browser jobs, which use the real Chrome
+window. It does not unlock the computer.
+
+This needs no permission and changes none of your system settings. It ends when
+humanikd stops. It cannot keep a Mac laptop awake with the lid closed, turn a
+computer on, or work while nobody is signed in.
+
 ## Closing and quitting
 
 Closing the window hides it. The app keeps running in the menu bar or tray, and

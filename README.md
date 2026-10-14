@@ -174,6 +174,41 @@ Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
 
+## What's new in v0.1.24
+
+**Updates can no longer break a machine by installing an older version.** A test
+build was offered the previous release as an "update", and that older version could
+not read the newer settings, so it started with the wrong settings and did not come
+back. Now:
+
+- a test build is never offered an older release;
+- the app never installs a humanikd older than itself;
+- the app and the install command first check that the new version can read your
+  settings, and stop without changing anything if it cannot.
+
+**Running the install command again restarts humanikd.** If humanikd is running, the
+installer restarts it on the new version (on Windows it stops it, replaces it and
+starts it again), and says "Updated X -> Y". A stopped service stays stopped.
+
+**`humanikd service start` works after a crash loop on macOS.** It used to fail with
+`Load failed: 5: Input/output error` when humanikd had been failing to start.
+
+## What's new in v0.1.23
+
+**This computer stays awake while it works.** Before, a laptop left alone could
+fall asleep in the middle of a job and freeze it. humanikd now keeps the computer
+awake while a job runs, and lets it sleep as usual between jobs.
+
+**A Sleep tab in the Humanik OS app.** Under **This machine > Sleep** you choose:
+let it sleep, stay awake while working, or always ready for jobs (optionally only
+while plugged in). You can also keep the screen on for browser jobs. The tab shows
+what your computer reports right now. It needs no permission and changes none of
+your system settings. The same setting is `power:` in `config.yaml`.
+
+**Save is always in reach.** On the Agent, Access, Sleep and Settings file tabs,
+the save buttons stay at the bottom of the window while you scroll, and say
+whether you have unsaved changes.
+
 ## What's new in v0.1.22
 
 **Windows: no more terminal windows opening on their own.** The Humanik OS app

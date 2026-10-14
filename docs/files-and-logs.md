@@ -8,6 +8,7 @@ Everything humanikd writes lives under `~/.humanikd/`. Nothing is written outsid
 | `config.yaml` | Your settings. Safe to edit; restart the daemon afterwards |
 | `serve.log` | What the daemon is doing (v0.1.13 and later), however it was started. Rotated at 8 MB to `serve.log.1` |
 | `notify-state.json` | When the daemon last showed each desktop notification, so a restart does not show it again. Safe to delete; the worst result is one extra notification |
+| `power-state.json` | Whether humanikd is keeping this computer awake right now, for the app and `humanikd status`. Rewritten every minute, removed when humanikd stops |
 | `app-presence.json` | Written every few seconds by the Humanik OS app while it runs, so humanikd knows to send its warnings through the app. Removed when the app quits |
 | `app-notices/` | Warnings humanikd left for the app. The app shows each one and deletes it |
 | `ws/<tenant>/<workspace>/` | The working folder for agent turns, one per workspace. Conversations in the same workspace share it |

@@ -15,7 +15,9 @@ The rows below are the problems whose message points somewhere other than the ca
 | --- | --- |
 | The machine shows offline in HumanikOS | humanikd is not running or not connected. Check `humanikd service status` and the log |
 | `enrolled: YES, but the key is UNREADABLE` | The daemon runs as a different account from the one that enrolled. Run it as that account. Do not re-enroll |
-| A config edit changed nothing | Config is read once at startup. Run `humanikd service stop`, then `humanikd service start` |
+| A config edit changed nothing | Config is read once at startup. Run `humanikd service restart` |
+| `field <name> not found in type config.fileConfig`, then `RUNNING ON DEFAULTS` | This humanikd is older than your settings: a newer version (or the app) wrote a setting it does not know. Install the latest release. From v0.1.24 the installer and the app refuse to install a version that cannot read your settings |
+| `Load failed: 5: Input/output error` when starting the service (macOS) | humanikd kept failing to start, and macOS still holds the service while it waits to retry. Run `launchctl kickstart -k gui/$(id -u)/humanikd`. From v0.1.24, `humanikd service start` does this itself |
 | The daemon stops at startup naming a key | A misspelled or misplaced setting in `config.yaml`. Most often `allowed_tools` written at the top level instead of under `backend.claude_agent` |
 | `humanikd upgrade` says you are current, but you are not | You are on a build made from source |
 | A notification says humanikd is out of date | A newer release exists. Run the command in the notification, or `humanikd upgrade` to see it. The daemon checks each time it starts and shows this at most once every 12 hours for the same release |
@@ -51,6 +53,7 @@ The rows below are the problems whose message points somewhere other than the ca
 | "Something went wrong in Humanik OS" with an error and **Copy details** | A screen in the app failed. Try **Try again**, then **Reload the app**. If it comes back, use **Copy details** and send us the text. humanikd is not affected and keeps serving |
 | "Application error: a client-side exception has occurred" | The same kind of failure in app v0.1.21, which did not show the error. Run the install command again to get the current version, which does |
 | On Windows, a terminal window opens for a moment every few seconds | App v0.1.21 opened one each time it checked humanikd's status. Fixed in v0.1.22: run the install command again |
+| The app offers to "update" humanikd to a LOWER version | You are on a test build (a version with a dash, such as 0.1.23-dev.1). Do not update; wait for the final release. Fixed in v0.1.24, which never offers a test build an older release |
 | No notifications | See [Notifications](notifications.md#if-notifications-do-not-appear) |
 
 ## Local models
