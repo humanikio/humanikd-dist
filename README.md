@@ -16,6 +16,9 @@ the office's credentials; this machine only sees each result. See
 > This repository holds the **released binaries + installer only.** The source is
 > maintained privately; these are the signed, runnable artifacts.
 
+The HumanikOS docs cover installing, what humanikd and the desktop app are, and how
+work reaches your machine: [docs.humanik.io/docs/devices](https://docs.humanik.io/docs/devices/install).
+
 ## Install
 
 **macOS / Linux**
@@ -163,6 +166,10 @@ Targets: `humanikd-darwin-arm64`, `humanikd-darwin-amd64`, `humanikd-linux-amd64
 | Page | What it covers |
 |---|---|
 | [How humanikd works](docs/how-it-works.md) | The outbound connection, how work arrives, sleep and reconnecting |
+| [Models, frameworks and agents](docs/models-and-frameworks.md) | The kinds of program that do the work here, and which one this computer serves |
+| [Claude Code](docs/claude-code.md) | Which setup jobs use, the account, connectors and MCP servers, the browser, and the exact command humanikd starts for each job |
+| [Ollama](docs/ollama.md) | Where Ollama is, which models are offered, and what humanikd does and does not do with it |
+| [OpenClaw](docs/openclaw.md) | The OpenClaw gateway service, Docker, and shared folders |
 | [Office tools on your machine](docs/office-tools.md) | How an agent here uses the office's tools without holding their credentials |
 | [Security](docs/security.md) | The tool limit, your key, connectors, the browser |
 | [Files and logs](docs/files-and-logs.md) | Everything under `~/.humanikd`, and files a turn brings with it |
@@ -173,6 +180,131 @@ Targets: `humanikd-darwin-arm64`, `humanikd-darwin-amd64`, `humanikd-linux-amd64
 Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
+
+## What's new in v0.1.29
+
+**Every screen says why Claude Code was not found, and how to fix it.** Before, a
+`binary:` line in `config.yaml` naming a Claude Code that had been moved showed as
+"Claude Code is not installed", with the install command. Installing again could not
+fix that. Now the message names the line and where Claude Code actually is. The
+Claude Code page has **Remove the line**, which shows the change to `config.yaml`
+before saving it, and `humanikd fix claude` does the same in a terminal. The Chrome
+checklist starts with "Claude Code is installed", and Overview lists the problem under
+**Needs you**.
+
+## What's new in v0.1.28
+
+**Windows: the log no longer grows without limit.** humanikd starts a new log file
+once `serve.log` passes 8 MiB. On Windows the app kept `serve.log` open in a way that
+blocked this, so while the app was open the log kept growing. macOS and Linux were
+not affected.
+
+**Windows: Docker is found in more places.** humanikd now also looks for `docker.exe`
+in Docker Desktop's folder and in `System32`.
+
+**Tested on Windows before every release.** Each release now runs the tests on
+Windows, macOS and Linux first. On Windows this includes the Chrome checks from
+v0.1.26: finding the Claude extension's registry entry and seeing that Chrome is open.
+
+## What's new in v0.1.27
+
+**Windows: the app no longer crashes while a command runs.** Pressing **Update
+Claude Code** crashed the page with "u is not a function" once the command printed
+its second line. **Update now**, the service buttons and linking use the same output
+panel, so they could crash the same way. The command itself kept running. macOS was
+not affected.
+
+## What's new in v0.1.26
+
+**Claude Code 2.1.300 or newer is needed for the browser.** Each release now names
+the oldest version of each framework it works with. When this computer uses Claude
+Code, OpenClaw or Ollama and its version is too old, the app says so on the
+framework's page, on **This machine › Overview**, **Agent** and **Updates**.
+**Update Claude Code** runs Claude Code's own `claude update`. Until Claude Code is
+updated, browser jobs are refused with the reason and linking Chrome does not
+start; other jobs still run. See [Claude Code](docs/claude-code.md#claude-code-version).
+
+**Windows: the Chrome checklist.** "Chrome is open" is now checked on Windows.
+"Chrome can reach Claude Code" is read from the registry; when it cannot be
+confirmed, the page says it could not check, instead of "not yet". In v0.1.25 both
+lines always showed "not yet" on Windows, even when jobs could use Chrome.
+
+**Linking Chrome says what went wrong.** When Claude Code does not reach Chrome,
+the message now includes the Claude Code version and what it answered.
+
+## What's new in v0.1.25
+
+**Check this if jobs on your computer use Gmail, Drive or other connectors.** With
+**My Claude Code** (the default), which connectors and MCP servers jobs may use is
+now decided by Claude Code's own settings: the `permissions.allow` list in
+`~/.claude/settings.json`. Claude Code already added that list to every job, so a
+setting in humanikd could only ever add to it. Connector rules you had in
+`allowed_tools` are kept for the separate setup and no longer used with My Claude
+Code. The app shows a warning for each one and a **Turn on here** button. See
+[Claude Code](docs/claude-code.md#which-claude-code-setup-jobs-use).
+
+**Browser jobs use only this computer's Chrome.** Claude in Chrome belongs to your
+Claude account, so a job could see Chrome on your other computers, and asking to
+switch browsers showed a "Connect?" prompt on all of them. Now humanikd links jobs
+to the Chrome on this computer (**Link this computer's Chrome** in the app, or
+`humanikd chrome link`), never lets a job switch browsers, and stops a job that
+picks another one.
+
+**New pages in the app: Frameworks and Models.** **Frameworks > Claude Code** shows
+the account jobs run as, your connectors and MCP servers in three groups (from
+your Claude account, added on this computer, from plugins), the browser, and the
+exact command humanikd starts for each job, with a button to copy it.
+**Frameworks > OpenClaw** and **Models > Ollama** show those programs. Each section
+says whether humanikd sets it or the program itself does.
+
+**Choose which Claude Code setup jobs use.** **My Claude Code** uses the Claude Code
+you use in Terminal. **Separate setup for jobs** uses its own folder
+(`~/.humanikd/claude`) with its own sign-in, so your hooks and `CLAUDE.md` stay out
+of jobs. Each setup keeps its own browser switch, and the separate setup its own
+MCP servers, so switching back and forth loses nothing.
+
+**Sign in to Claude Code from the app**, with a **Cancel** button if you close the
+browser tab. Links that open your browser now show an arrow.
+
+**For `config.yaml`:** two new keys, `backend.claude_agent.claude_dir` and
+`backend.claude_agent.setups`. Older humanikd refuses a file that has them, so the
+app writes them only when your settings need them. See
+[Claude Code](docs/claude-code.md#in-configyaml).
+
+## What's new in v0.1.24
+
+**Updates can no longer break a machine by installing an older version.** A test
+build was offered the previous release as an "update", and that older version could
+not read the newer settings, so it started with the wrong settings and did not come
+back. Now:
+
+- a test build is never offered an older release;
+- the app never installs a humanikd older than itself;
+- the app and the install command first check that the new version can read your
+  settings, and stop without changing anything if it cannot.
+
+**Running the install command again restarts humanikd.** If humanikd is running, the
+installer restarts it on the new version (on Windows it stops it, replaces it and
+starts it again), and says "Updated X -> Y". A stopped service stays stopped.
+
+**`humanikd service start` works after a crash loop on macOS.** It used to fail with
+`Load failed: 5: Input/output error` when humanikd had been failing to start.
+
+## What's new in v0.1.23
+
+**This computer stays awake while it works.** Before, a laptop left alone could
+fall asleep in the middle of a job and freeze it. humanikd now keeps the computer
+awake while a job runs, and lets it sleep as usual between jobs.
+
+**A Sleep tab in the Humanik OS app.** Under **This machine > Sleep** you choose:
+let it sleep, stay awake while working, or always ready for jobs (optionally only
+while plugged in). You can also keep the screen on for browser jobs. The tab shows
+what your computer reports right now. It needs no permission and changes none of
+your system settings. The same setting is `power:` in `config.yaml`.
+
+**Save is always in reach.** On the Agent, Access, Sleep and Settings file tabs,
+the save buttons stay at the bottom of the window while you scroll, and say
+whether you have unsaved changes.
 
 ## What's new in v0.1.22
 
