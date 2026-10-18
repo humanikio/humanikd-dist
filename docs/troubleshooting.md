@@ -27,6 +27,8 @@ The rows below are the problems whose message points somewhere other than the ca
 
 | What you see | What it means |
 | --- | --- |
+| `config.yaml sets backend.claude_agent.binary to …, which does not exist` | Claude Code was reinstalled or moved, and `config.yaml` still names the old place. Run `humanikd fix claude` to remove that line (humanikd then finds Claude Code by itself), or press **Remove the line** on the Claude Code page in the app. Both show the change before saving and keep `config.yaml.bak` |
+| `Claude Code was not found. Looked on PATH and in …` | Claude Code is not installed in any place humanikd looks. Install it with the command shown. On Windows, run it in PowerShell |
 | Jobs fail with `authentication_failed` or `auth_required` | This machine is not signed in to Claude Code. Run `claude` once and sign in |
 | Tools are visible but every call is refused | The tool is not in `allowed_tools`. `humanikd verify` prints the exact names for your MCP servers |
 | A connector that worked yesterday is gone | The machine is signed into a different Claude account. `claude.ai` connectors belong to the account |

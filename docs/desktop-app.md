@@ -81,6 +81,20 @@ Turn it off in **Profile > Notifications > Open at login**. It is also listed in
 If you move the app to another folder, the login entry follows it the next time
 the app starts.
 
+## Models and frameworks
+
+The app has a page for each program that can do the work on this computer:
+
+- **Frameworks › Claude Code** and **Frameworks › OpenClaw**: agent programs
+  that run whole jobs. See [claude-code.md](claude-code.md) and
+  [openclaw.md](openclaw.md).
+- **Models › Ollama**: a model that answers with text, with no tools. See
+  [ollama.md](ollama.md).
+
+**This machine › Agent** chooses which one this computer serves, and **This
+machine › Access** sets what jobs may do here. How the pieces fit:
+[models-and-frameworks.md](models-and-frameworks.md).
+
 ## Keeping this computer awake
 
 Humanik can only send work to a computer that is awake. The **Sleep** tab under
@@ -111,6 +125,13 @@ Run the install command again. It replaces the app with the newest release and
 opens it. Your sign-in, workspace choice and settings are kept.
 
 The app's **Machine > Updates** tab updates humanikd, not the app.
+
+The same tab lists the frameworks this computer uses (Claude Code, OpenClaw,
+Ollama) with their versions. A framework older than the oldest version humanikd
+works with is flagged there, on Overview, on Agent and on its own page. Claude
+Code can be updated from the app; OpenClaw shows the install command for its
+tested range; Ollama links to its download page. A framework this computer does
+not use is not checked.
 
 ## If the app shows an error
 
