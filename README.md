@@ -181,6 +181,73 @@ Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
 
+## What's new in v0.1.33
+
+**A finished answer is no longer thrown away.** When Claude Code had answered a job and
+then failed while closing, humanikd reported the whole job as failed. One example: a
+plugin's end-of-session hook could not find `node`. An office then answered with its
+backup model instead, and that answer was charged to your credits. humanikd now keeps
+the answer and writes the error to its log. A job you or Humanik stopped is still
+reported as stopped.
+
+**Claude Code hooks can find your programs.** humanikd runs as a background service, and
+a service gets a short PATH (`/usr/bin:/bin:/usr/sbin:/sbin` on a Mac). Plugin hooks that
+run `node` or another program installed with Homebrew failed with "command not found".
+Jobs now get the same extra folders humanikd already searches: Homebrew,
+`/usr/local/bin`, `~/.local/bin` and npm's global folder.
+
+**Everything means every tool.** With `allowed_tools: ["*"]`, a job that did not list its
+tools was refused. It now gets every built-in tool plus every MCP server and connector
+your Claude Code setup has.
+
+**Files between this computer and Humanik.** An office tool can upload a file from this
+computer straight to storage, or save a file here, but only in the folders you allow
+(`local_files` in the config; **Folders jobs may use** in the app). humanikd's and
+Claude Code's own files are always refused.
+
+**Optional file scope.** You can limit file tools and commands to set folders. Both are
+off by default. See CONFIG.md.
+
+**Large output no longer ends a job.** One output event can be up to 64 MB. A larger one
+is skipped and the job continues.
+
+## What's new in v0.1.32
+
+**Chat notifications use one request for every workspace.** Before, the app asked Humanik
+for your chats once per workspace, every few minutes and each time you switched back to it,
+which slowed chat lists for everyone. It now asks once. Switching back to the app refreshes
+your chats and notifications at most once a minute. A failed refresh keeps what you already
+have.
+
+Notifications cover your chats with AI employees. Chats your Nova has with them are no longer
+included, because you are not a member of those chats.
+
+## What's new in v0.1.31
+
+**No visible changes.** The app no longer carries code for a HumaChat request that
+Humanik has retired. Nothing in the app used it.
+
+## What's new in v0.1.30
+
+**The app updates itself.** Before, **Update now** replaced humanikd only, and
+nothing said the app was out of date, so a Mac could run the newest humanikd with
+an app several versions old (missing the Frameworks and Models pages). Now the
+app checks its own version too. When it is older than the newest release,
+**Update now** replaces it after humanikd: it downloads the app, checks it against
+its published checksum, then the app closes and opens again on the new version.
+The tray, the update button at the top of the window, Overview and the Updates tab
+all count an out-of-date app.
+
+An app older than v0.1.30 cannot update itself. Run the install command once:
+
+```bash
+curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
+```
+
+```powershell
+irm https://github.com/humanikio/humanikd-dist/releases/latest/download/install.ps1 | iex
+```
+
 ## What's new in v0.1.29
 
 **Every screen says why Claude Code was not found, and how to fix it.** Before, a

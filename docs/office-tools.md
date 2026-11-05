@@ -55,6 +55,14 @@ machine**: read files, run commands, use the MCP servers you configured here.
 your machine: they run in the office, under the office's own permissions. If the job brings
 office tools, humanikd bridges them, and there is nothing to configure.
 
+**One exception: files on this machine.** When an office tool uploads a file from your machine
+to a bucket, or downloads a bucket file to it (`localPath` on the data plane tools), humanikd
+moves the file itself. The file goes straight between your machine and storage through a
+short-lived link for that one file; it never passes through the model or the office. It is
+read or saved only inside the folders set under Machine › Access › Folders jobs may use (by
+default, the job's own folder), and is 50 MB at most. A refused path comes back to the agent
+with the list of allowed folders.
+
 ## Limits today
 
 - **The tool list arrives with every turn.** Nothing is kept between turns, so a new

@@ -163,7 +163,10 @@ the server each time Claude Code starts, so nobody types a list of tools.
   (see above), right away and for Terminal too.
 
 If tools are set to Everything under This machine › Access, every server is
-allowed.
+allowed, and each one shows "On (Everything)". humanikd keeps the list jobs use in
+`~/.humanikd/tool-inventory.json`: it lists the servers when it starts and whenever
+this page lists them, so after adding a connector, open this page or press Check
+again.
 
 **Tools Humanik sends with a job are always available to it.** An office's own
 tools (its CRM, its email) run in Humanik with the office's sign-ins, and are
@@ -237,7 +240,8 @@ claude -p
 | `--mcp-config` | The office's tools, through a small server humanikd runs for the job |
 | `--strict-mcp-config` | Leaves out every connector and MCP server of your own |
 | `--chrome` | Starts Claude in Chrome |
-| `--append-system-prompt` | Names this computer's linked Chrome. A job that picks another browser is stopped |
+| `--settings` | Only when a switch under Folders jobs may use is on: the hook that holds file tools to those folders, and the command sandbox |
+| `--append-system-prompt` | Tells the agent where tools, connectors and folders are set in the app, so a refused tool comes with the right advice. Also names this computer's linked Chrome; a job that picks another browser is stopped |
 | `--disallowedTools` | `switch_browser` always; also `select_browser` until this computer's Chrome is linked |
 | `--allowedTools` | The tools the job may use, narrowed to what the job asks for, plus Humanik's tools. Always last. With **Separate setup for jobs**: your Tools list and the connector switches. With **My Claude Code**: your Tools list and the browser only; connectors are not named here, because your Claude Code settings decide them |
 
