@@ -34,8 +34,16 @@ backend:
 - The default is read-only.
 - `Write`, `Edit` and `Bash` are available but off until you add them. Prefer narrow
   forms such as `Bash(git status *)` over `Bash`.
-- `["*"]` removes the limit, for a machine whose only job is serving agents. Jobs then have
-  to name the tools they need. It cannot be mixed with named tools.
+- `["*"]` (Everything in the app) removes the limit, for a machine whose only job is
+  serving agents. Jobs get every built-in tool, every connector and MCP server of the
+  Claude Code setup, and the browser when it is on. A job that names the tools it wants
+  gets only those. It cannot be mixed with named tools.
+- **Folders jobs may use.** When an office uploads a file from your machine to a bucket,
+  or downloads one to it, humanikd moves the file itself, only inside these folders (by
+  default the job's own folder). Two switches, off by default, also hold every file
+  tool (a Claude Code hook) and every command (Claude Code's sandbox, not on Windows)
+  to the same folders. `~/.humanikd` outside its job folders, `~/.ssh` and Claude
+  Code's sign-in files are always refused. See CONFIG.md, `local_files`.
 - `bypassPermissions` is always refused, whether it comes from your config or a job.
 
 ### Where an agent can reach

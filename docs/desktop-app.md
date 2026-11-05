@@ -121,10 +121,16 @@ icon. Click the icon, or open the app again, to bring the window back.
 
 ## Updating
 
-Run the install command again. It replaces the app with the newest release and
-opens it. Your sign-in, workspace choice and settings are kept.
+The app's **Machine > Updates** tab updates humanikd and, from v0.1.30, the app
+itself. When the app is older than the newest release, **Update now** replaces it
+last: it downloads the app, checks it against its published checksum, then the
+app closes and opens again on the new version. Your sign-in, workspace choice and
+settings are kept. The tray menu, the update button at the top of the window and
+Overview all say when the app is out of date.
 
-The app's **Machine > Updates** tab updates humanikd, not the app.
+Running the install command again does the same, and is the way to update an app
+older than v0.1.30, which cannot update itself. It is also the way when the app's
+folder cannot be written to.
 
 The same tab lists the frameworks this computer uses (Claude Code, OpenClaw,
 Ollama) with their versions. A framework older than the oldest version humanikd

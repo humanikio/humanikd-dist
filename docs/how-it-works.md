@@ -68,7 +68,9 @@ after the connection stops.
 | HumanikOS deploys the gateway | humanikd is asked to reconnect and does so, starting at about a second |
 
 Work for an employee whose machine is offline falls back to the cloud. It never moves to
-another of your machines.
+another of your machines. Only an offline machine falls back: when the machine is online
+and reports an error (a setting it refuses, a sign-in it needs), that error is shown to
+you as it is, because a cloud model cannot see or fix your machine.
 
 **A turn in progress is not resumed.** If the connection drops in the middle of a long
 agent turn, the rest of that turn is lost and the work has to be asked for again.
