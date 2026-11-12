@@ -1,3 +1,13 @@
+<!--
+  This is the PUBLIC README for humanikio/humanikd-dist.
+  Copy its contents into that repo's README.md. It ships no source — only the
+  compiled binaries + install.sh (published here as release assets by the private
+  humanikd repo's CI). Keep it user-facing: install + run, nothing about building.
+  The longer pages live in docs/public/ and ship to the dist repo's docs/ folder in
+  the same PR. Every "## What's new in <tag>" section must stay: the release
+  workflow extracts it for the release notes.
+-->
+
 # humanikd
 
 The downloadable **device daemon** for HumanikOS. It runs on a machine you own,
@@ -24,15 +34,22 @@ work reaches your machine: [docs.humanik.io/docs/devices](https://docs.humanik.i
 **macOS / Linux**
 
 ```bash
-curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
+curl -fsSL https://app.humanik.io/install.sh | sh
 humanikd setup   # guided first-run — START HERE
 ```
+
+Installs to `/usr/local/bin`. A new Mac has no such folder yet; the installer creates
+it. Creating or writing to it needs your password, so run the command in a terminal,
+and paste it as one line (`curl: (2) no URL specified` means it was split in two).
+`app.humanik.io/install.sh` redirects to this repo's latest `install.sh`; the GitHub
+address (`https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh`)
+works too.
 
 **Windows** — use PowerShell. (The line above cannot work here: PowerShell
 aliases `curl` to `Invoke-WebRequest`, which rejects `-fsSL`.)
 
 ```powershell
-irm https://github.com/humanikio/humanikd-dist/releases/latest/download/install.ps1 | iex
+irm https://app.humanik.io/install.ps1 | iex
 humanikd setup   # guided first-run — START HERE
 ```
 
@@ -180,6 +197,20 @@ Targets: `humanikd-darwin-arm64`, `humanikd-darwin-amd64`, `humanikd-linux-amd64
 Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
+
+## What's new in v0.1.34
+
+**Installs on a new Mac.** A new Mac has no `/usr/local/bin` folder, and the installer
+stopped with `mv: rename ... No such file or directory` after you typed your password.
+The installer, and the app's **Update humanikd** button, now create the folder first.
+
+**A clear message when there is no terminal.** When the install folder needs your
+password and there is nowhere to type it (an agent's shell, CI), the installer now stops
+before downloading anything and tells you to run it in Terminal. It also removes its
+temporary files however it ends.
+
+**A shorter install command.** `curl -fsSL https://app.humanik.io/install.sh | sh` fits
+on one line when pasted. `humanikd upgrade` and the update notices print it too.
 
 ## What's new in v0.1.33
 
@@ -668,7 +699,7 @@ The installer always fetches the **latest** release, so re-running it upgrades i
 place:
 
 ```bash
-curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
+curl -fsSL https://app.humanik.io/install.sh | sh
 ```
 
 `humanikd upgrade` tells you whether a newer version exists (it doesn't modify
@@ -676,6 +707,5 @@ anything — it just checks and prints the command above). To pin a specific ver
 instead of latest:
 
 ```bash
-HUMANIKD_VERSION=v0.1.0 \
-  curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
+curl -fsSL https://app.humanik.io/install.sh | HUMANIKD_VERSION=v0.1.0 sh
 ```
