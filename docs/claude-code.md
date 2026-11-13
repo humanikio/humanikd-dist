@@ -297,19 +297,40 @@ What the link does:
 
 - The page shows the linked browser, and the other profiles and computers on
   your account, which jobs here never use.
-- Chrome remembers the browser picked last on your Claude account, and a browser
-  action that does not choose a browser goes to that one, even on another
-  computer. So humanikd checks every browser action before it runs. A job must
-  first select this computer's Chrome. Until it does, every other browser action
-  is refused, and the job is told which browser to select. Listing browsers,
-  switching browsers and selecting another computer's browser are always
-  refused.
-- Until this computer's Chrome is linked, every browser action in a job is
-  refused, with a message to link it. This holds even when your account has only
-  one browser, because that browser can be on another computer.
+- Every browser action in a job is checked before it runs (see "How browser jobs
+  are checked" below).
 - Each link attempt, and why one failed, is recorded. Each browser job's choice,
   and each refused action, is written to humanikd's log. Both are on This
   machine › Logs, under Browser.
+
+### How browser jobs are checked
+
+Chrome remembers the browser picked last on your Claude account, and a browser
+action that does not choose a browser goes to that one, even when it is on
+another computer. So humanikd adds a check (a Claude Code hook) to every browser
+job. Claude Code runs it before each browser action, outside the agent, so the
+agent cannot skip it.
+
+| The job tries to | Not linked | Linked, before it selects | Linked, after it selects |
+| --- | --- | --- | --- |
+| Select this computer's linked Chrome | Refused | **Approved by humanikd** | **Approved by humanikd** |
+| Select any other browser | Refused | Refused | Refused |
+| List or switch browsers | Refused | Refused | Refused |
+| Any other browser action (open a page, click, type, read) | Refused | Refused | Allowed, and Claude Code's own checks still apply |
+
+- **Selecting the linked Chrome is approved by humanikd.** Claude Code's safety
+  check can refuse a select that nobody in the chat asked for. You already chose
+  this browser when you linked it, so humanikd tells Claude Code the select is
+  approved. This is the only call humanikd approves. It does not approve what a
+  job does on a web page.
+- **A refused action does not end the job.** The agent is told why, for example
+  "call select_browser with deviceId … before any other browser action", and
+  normally selects this computer's Chrome and goes on.
+- **Each job selects again.** The selection belongs to one job. The next job
+  starts unselected, because another computer may have become the browser picked
+  last in between.
+- **What you can see:** each select and each refused action is a `[browser]`
+  line in humanikd's log, on This machine › Logs under Browser.
 
 Linking needs Claude Code 2.1.300 or newer. With an older Claude Code, Link
 stops with a message saying so, and browser jobs are refused until Claude Code

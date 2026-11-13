@@ -92,7 +92,10 @@ with `claude mcp add` stay. Run `humanikd verify` after any account change.
 A Claude Code agent can drive your real browser, using the sessions you are signed into.
 It is off by default, needs two settings, and acts as you everywhere you are logged in.
 Browsers belong to your Claude account, so humanikd links jobs to the Chrome on this
-computer (see [Claude Code](claude-code.md#link-this-computers-chrome)). It cannot be combined with
+computer (see [Claude Code](claude-code.md#link-this-computers-chrome)). A check that
+humanikd adds to every browser job refuses any browser action until the job has selected
+that Chrome, and refuses other browsers outright (see
+[How browser jobs are checked](claude-code.md#how-browser-jobs-are-checked)). It cannot be combined with
 `mcp.scope: isolated`. Read the product docs page before turning it on:
 [Let jobs use your browser](https://docs.humanik.io/docs/devices/browser).
 

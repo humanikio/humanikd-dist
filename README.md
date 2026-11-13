@@ -188,6 +188,14 @@ Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
 
+## What's new in v0.1.37
+
+**Browser jobs are not stopped when they select this computer's Chrome.** Claude Code's
+safety check could refuse a job's select of the linked Chrome, because nobody in the chat
+had asked for it, and the job then could not use the browser. You chose that browser when
+you linked it, so humanikd now approves that one select. It approves nothing else: what a
+job does on a web page is checked by Claude Code as before.
+
 ## What's new in v0.1.36
 
 **Computers with more than one Chrome profile can link.** When several Chrome profiles on
