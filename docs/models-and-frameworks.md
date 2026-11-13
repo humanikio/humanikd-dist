@@ -16,11 +16,13 @@ your Claude account.
 ## What this computer serves today
 
 A computer serves one of the three programs at a time: Claude Code, Ollama or
-OpenClaw. Choose it in the app under **This machine › Agent**, or in
+OpenClaw. Choose it in the app under **This machine › Run mode**, or in
 `config.yaml`. Every job Humanik sends to this computer goes to that program.
 
 Each program still has its own page, and you can set it up before you switch to
-it.
+it. A page for a program this computer does not run is greyed and says which
+program runs instead. Its settings still work. Each page has a **Change run
+mode** button that opens **This machine › Run mode**.
 
 ## Pages in the app
 

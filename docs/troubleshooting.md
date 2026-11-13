@@ -38,6 +38,18 @@ The rows below are the problems whose message points somewhere other than the ca
 | An office tool returned no picture | The picture was over the size limit (the tool's text says so), or humanikd is older than v0.1.12 |
 | `refusing to run: …/.mcp.json exists` | The agent wrote an MCP config into its working folder. Remove it, or move those servers into your own Claude Code config |
 
+## The browser
+
+| What you see | What it means |
+| --- | --- |
+| `None of the browsers on your Claude account is on this computer` | Chrome is not open here, or the Claude extension here is signed out or signed in to another Claude account. Open Chrome, check the extension, and link again |
+| A list of Chrome profiles to choose from | More than one Chrome profile on this computer is signed in to the extension. Press **Use this profile** on the one jobs should use, or run `humanikd chrome link --pick` |
+| `The list of Chrome profiles is out of date` | More than 10 minutes passed since the list was made. Press **Link this computer's Chrome** again |
+| A job says `this computer's Chrome is not linked` | Link it on **Frameworks › Claude Code**, or run `humanikd chrome link`. No restart is needed |
+| A job says `call select_browser with deviceId …` | The agent tried a browser action before selecting this computer's Chrome. It is told which browser to select and normally goes on by itself |
+| Browser jobs keep being refused after a select | The linked Chrome is closed, or its extension was reinstalled and has a new id. Open Chrome and link again |
+| What did a browser job do? | **This machine › Logs**, Browser filter: the browser each job selected, each refused action, and every link attempt (`chrome-link.log`) |
+
 ## Windows
 
 | What you see | What it means |

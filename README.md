@@ -1,13 +1,3 @@
-<!--
-  This is the PUBLIC README for humanikio/humanikd-dist.
-  Copy its contents into that repo's README.md. It ships no source — only the
-  compiled binaries + install.sh (published here as release assets by the private
-  humanikd repo's CI). Keep it user-facing: install + run, nothing about building.
-  The longer pages live in docs/public/ and ship to the dist repo's docs/ folder in
-  the same PR. Every "## What's new in <tag>" section must stay: the release
-  workflow extracts it for the release notes.
--->
-
 # humanikd
 
 The downloadable **device daemon** for HumanikOS. It runs on a machine you own,
@@ -197,6 +187,38 @@ Targets: `humanikd-darwin-arm64`, `humanikd-darwin-amd64`, `humanikd-linux-amd64
 Everything humanikd writes lives under `~/.humanikd/`. **Back up
 `identity.json`**: it is this machine's enrollment key and cannot be reissued.
 `~/.humanikd/serve.log` is the first place to look when something is wrong.
+
+## What's new in v0.1.36
+
+**Computers with more than one Chrome profile can link.** When several Chrome profiles on
+this computer are signed in to the Claude extension, linking used to stop and ask you to
+sign the extension out of all but one. Now the app lists the profiles and you choose the
+one jobs should use, with **Use this profile**. In a terminal, run
+`humanikd chrome link --pick`. Each row shows when that profile connected, since Chrome
+does not say the profile's name. Only profiles on this computer can be chosen.
+
+## What's new in v0.1.35
+
+**Browser jobs use only this computer's Chrome, checked before every action.** Chrome
+remembers the browser picked last on your Claude account, and a browser action that did
+not choose a browser went to that one, even on another computer. humanikd now checks
+every browser action before it runs: a job must first select this computer's linked
+Chrome, and until it does, every other browser action is refused. Listing and switching
+browsers are always refused, and so are browser actions before this computer's Chrome is
+linked. A linked job no longer asks you which browser to use.
+
+**Browser events in the log.** Which browser each job selected, and each refused action,
+are in `serve.log`. Every link attempt, and why one failed, is in `chrome-link.log`. Both
+are on This machine › Logs under the new Browser filter.
+
+**Run mode.** This machine › Agent is now **Run mode**: the one program humanikd hands
+every job to. On Frameworks and Models, the program this computer does not run is
+greyed, still opens so you can set it up, and each page has a **Change run mode**
+button.
+
+**The installer keeps a pinned version.** When it stops because there is no terminal
+for your password, the command it tells you to run now keeps `HUMANIKD_VERSION`, so it
+installs the version you asked for and not the latest release.
 
 ## What's new in v0.1.34
 

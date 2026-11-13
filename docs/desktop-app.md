@@ -24,13 +24,13 @@ The install command installs the app with humanikd:
 **macOS**
 
 ```bash
-curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh
+curl -fsSL https://app.humanik.io/install.sh | sh
 ```
 
 **Windows** (PowerShell)
 
 ```powershell
-irm https://github.com/humanikio/humanikd-dist/releases/latest/download/install.ps1 | iex
+irm https://app.humanik.io/install.ps1 | iex
 ```
 
 | | macOS | Windows |
@@ -45,11 +45,11 @@ Linux gets humanikd only. There is no Linux app.
 **To install humanikd without the app:**
 
 ```bash
-curl -fsSL https://github.com/humanikio/humanikd-dist/releases/latest/download/install.sh | sh -s -- --no-app
+curl -fsSL https://app.humanik.io/install.sh | sh -s -- --no-app
 ```
 
 ```powershell
-$env:HUMANIKD_NO_APP = '1'; irm https://github.com/humanikio/humanikd-dist/releases/latest/download/install.ps1 | iex
+$env:HUMANIKD_NO_APP = '1'; irm https://app.humanik.io/install.ps1 | iex
 ```
 
 ### Why there is no download button
@@ -91,8 +91,9 @@ The app has a page for each program that can do the work on this computer:
 - **Models › Ollama**: a model that answers with text, with no tools. See
   [ollama.md](ollama.md).
 
-**This machine › Agent** chooses which one this computer serves, and **This
-machine › Access** sets what jobs may do here. How the pieces fit:
+**This machine › Run mode** chooses which one this computer serves, and **This
+machine › Access** sets what jobs may do here. The program this computer does not
+serve is greyed on its page, and each page has a **Change run mode** button. How the pieces fit:
 [models-and-frameworks.md](models-and-frameworks.md).
 
 ## Keeping this computer awake
@@ -134,7 +135,7 @@ folder cannot be written to.
 
 The same tab lists the frameworks this computer uses (Claude Code, OpenClaw,
 Ollama) with their versions. A framework older than the oldest version humanikd
-works with is flagged there, on Overview, on Agent and on its own page. Claude
+works with is flagged there, on Overview, on Run mode and on its own page. Claude
 Code can be updated from the app; OpenClaw shows the install command for its
 tested range; Ollama links to its download page. A framework this computer does
 not use is not checked.
