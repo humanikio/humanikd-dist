@@ -223,9 +223,10 @@ claude -p
   --tools Read,Grep,Glob               # built-in tools that exist in the job
   --mcp-config <Humanik's tools>       # only when the job brings office tools
   --strict-mcp-config                  # only with Humanik's only
+  --settings <...>                      # only with a folder switch or the browser on
   --chrome                             # only with the browser on
   --append-system-prompt <...>         # only with the browser on and linked
-  --disallowedTools switch_browser     # only with the browser on
+  --disallowedTools switch_browser list_connected_browsers   # only with the browser on
   --allowedTools Read Grep Glob mcp__claude_ai_Gmail
 ```
 
@@ -240,9 +241,9 @@ claude -p
 | `--mcp-config` | The office's tools, through a small server humanikd runs for the job |
 | `--strict-mcp-config` | Leaves out every connector and MCP server of your own |
 | `--chrome` | Starts Claude in Chrome |
-| `--settings` | Only when a switch under Folders jobs may use is on: the hook that holds file tools to those folders, and the command sandbox |
+| `--settings` | When a switch under Folders jobs may use is on: the hook that holds file tools to those folders, and the command sandbox. With the browser on: the browser check that runs before every browser action (see Browser below) |
 | `--append-system-prompt` | Tells the agent where tools, connectors and folders are set in the app, so a refused tool comes with the right advice. Also names this computer's linked Chrome; a job that picks another browser is stopped |
-| `--disallowedTools` | `switch_browser` always; also `select_browser` until this computer's Chrome is linked |
+| `--disallowedTools` | `switch_browser` and `list_connected_browsers` always; also `select_browser` until this computer's Chrome is linked |
 | `--allowedTools` | The tools the job may use, narrowed to what the job asks for, plus Humanik's tools. Always last. With **Separate setup for jobs**: your Tools list and the connector switches. With **My Claude Code**: your Tools list and the browser only; connectors are not named here, because your Claude Code settings decide them |
 
 Claude Code also adds the `permissions.allow` list from the setup's
@@ -271,16 +272,65 @@ Browsers, like connectors, belong to your Claude account. If the same account is
 signed in to Chrome on two computers, a job could see both. So humanikd links
 browser jobs to the Chrome on this computer:
 
-- Press **Link this computer's Chrome** (or run `humanikd chrome link`). humanikd
-  asks the Claude extension which browser is on this computer and saves it.
-  Nobody is asked anything, on this computer or any other.
-- The page shows the linked browser, for example "Browser 2 · macOS", and the
-  other browsers on your account, which jobs here never use.
-- From then on, every browser job is told to use only that browser. A job that
-  tries to use another one, or to switch browsers, is stopped.
-- Until a browser is linked, jobs cannot choose between browsers at all. With
-  only one browser on the account nothing changes; with more than one, browser
-  jobs stop instead of picking one.
+In the app:
+
+1. Open Chrome on this computer, in the profile you want jobs to use, with the
+   Claude extension signed in.
+2. Open **Frameworks › Claude Code**. In **Browser (Claude in Chrome)**, turn on
+   **Let jobs use Chrome** and press **Save and restart** if it was off.
+3. Press **Link this computer's Chrome**. It takes a few seconds. humanikd asks
+   the Claude extension which browser is on this computer and saves it. Nobody is
+   asked anything, on this computer or any other.
+4. If more than one Chrome profile on this computer is signed in to the Claude
+   extension, each profile counts as its own browser, and the page lists them as
+   Profile 1, Profile 2 and so on. Press **Use this profile** on the one jobs
+   should use. Chrome does not say which profile is which, so each row shows when
+   it connected: the profile you opened last connected last. Only profiles on
+   this computer can be chosen.
+5. The line **This computer's Chrome is linked** gets a tick. No restart is
+   needed: each job reads the link when it starts.
+
+In a terminal: `humanikd chrome link`, then `humanikd chrome link --pick` when it
+lists several profiles. `humanikd chrome status` shows the link.
+
+What the link does:
+
+- The page shows the linked browser, and the other profiles and computers on
+  your account, which jobs here never use.
+- Every browser action in a job is checked before it runs (see "How browser jobs
+  are checked" below).
+- Each link attempt, and why one failed, is recorded. Each browser job's choice,
+  and each refused action, is written to humanikd's log. Both are on This
+  machine › Logs, under Browser.
+
+### How browser jobs are checked
+
+Chrome remembers the browser picked last on your Claude account, and a browser
+action that does not choose a browser goes to that one, even when it is on
+another computer. So humanikd adds a check (a Claude Code hook) to every browser
+job. Claude Code runs it before each browser action, outside the agent, so the
+agent cannot skip it.
+
+| The job tries to | Not linked | Linked, before it selects | Linked, after it selects |
+| --- | --- | --- | --- |
+| Select this computer's linked Chrome | Refused | **Approved by humanikd** | **Approved by humanikd** |
+| Select any other browser | Refused | Refused | Refused |
+| List or switch browsers | Refused | Refused | Refused |
+| Any other browser action (open a page, click, type, read) | Refused | Refused | Allowed, and Claude Code's own checks still apply |
+
+- **Selecting the linked Chrome is approved by humanikd.** Claude Code's safety
+  check can refuse a select that nobody in the chat asked for. You already chose
+  this browser when you linked it, so humanikd tells Claude Code the select is
+  approved. This is the only call humanikd approves. It does not approve what a
+  job does on a web page.
+- **A refused action does not end the job.** The agent is told why, for example
+  "call select_browser with deviceId … before any other browser action", and
+  normally selects this computer's Chrome and goes on.
+- **Each job selects again.** The selection belongs to one job. The next job
+  starts unselected, because another computer may have become the browser picked
+  last in between.
+- **What you can see:** each select and each refused action is a `[browser]`
+  line in humanikd's log, on This machine › Logs under Browser.
 
 Linking needs Claude Code 2.1.300 or newer. With an older Claude Code, Link
 stops with a message saying so, and browser jobs are refused until Claude Code
@@ -303,7 +353,7 @@ humanikd does not hold it back.
 
 When this computer runs Claude Code jobs and its Claude Code is older, the app
 says so in four places: this page, **This machine › Overview**, **This machine ›
-Agent** and **This machine › Updates**. **Update Claude Code** runs Claude Code's
+Run mode** and **This machine › Updates**. **Update Claude Code** runs Claude Code's
 own `claude update`, the same as in a terminal, and shows its output. You can
 also run `claude update` yourself.
 
